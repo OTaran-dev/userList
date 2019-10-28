@@ -104,13 +104,20 @@ document.addEventListener('click', function (event) {
 });
 
 function updateSearchParams() {
-    let tmp = location.search.split('?');
-    let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
-    if (tmp.length > 1) { //for correct test on GitHub
-        tmp[tmp.length - 1] = searchString;
-        location.search = tmp.join('');
+    let githubHost = 'https://github.com';
+    if (location.search.search(githubHost)) {
+        let tmp = location.search.split('?');
+        let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+        if (tmp.length > 1) { //for correct test on GitHub
+            tmp[tmp.length - 1] = searchString;
+            location.search = tmp.join('');
+        }
+        else location.search = tmp.join('');
     }
-    else location.search = searchString;
+    else {
+        let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+        location.search = searchString;
+    }
 }
 
 function parseSearchParams() {
