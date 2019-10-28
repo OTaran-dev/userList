@@ -61,7 +61,6 @@ data.forEach(element => {
 });
 
 userList.sortBy('id', 'asc');
-console.log(userList);
 document.body.innerHTML = userList.getTableHtml();
 parseSearchParams();
 
@@ -73,6 +72,7 @@ document.addEventListener('click', function (event) {
 });
 
 function parseSearchParams() {
+    console.log(location);
     const searchString = location.search.substr(1);
     let tmp = searchString.split('&');
     let searchParams = {};
@@ -83,6 +83,7 @@ function parseSearchParams() {
         searchParams[p[0]] = p[1];
     });
 
+    console.log(searchParams);
     if (searchParams.sortBy) {
         let order;
         if (searchParams.order) order = searchParams.order;
