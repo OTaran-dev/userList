@@ -105,9 +105,11 @@ document.addEventListener('click', function (event) {
 
 function updateSearchParams() {
     let tmp = location.href.split('?');
-    let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
-    tmp[tmp.length-1] = searchString;
-    location.href = tmp.join('');
+    if (tmp.length > 2) { //for correct test on GitHub
+        let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+        tmp[tmp.length - 1] = searchString;
+        location.href = tmp.join('');
+    }
 }
 
 function parseSearchParams() {
