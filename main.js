@@ -43,7 +43,7 @@ class UserList extends Array {
             const data = firstUser[key];
             if (typeof (data) !== 'object') {
                 let sortIcon;
-                if (key == currentSortKey){
+                if (key == currentSortKey) {
                     if (currentSortOrder == 'asc') sortIcon = '↑';
                     else sortIcon = '↓';
                 }
@@ -84,9 +84,9 @@ document.addEventListener('click', function (event) {
     if (event.target.tagName === 'TH') {
         let order;
         let sortKey = event.target.querySelector('.col-name').innerHTML;
-        
-        if (sortKey == userList.sortedByKey){
-            if (event.target.querySelector('.order-flag').innerHTML == '↑' && userList.sortOrder == 'asc'){
+
+        if (sortKey == userList.sortedByKey) {
+            if (event.target.querySelector('.order-flag').innerHTML == '↑' && userList.sortOrder == 'asc') {
                 order = 'desc';
             }
             else {
@@ -98,8 +98,14 @@ document.addEventListener('click', function (event) {
         userList.sortBy(sortKey, order);
         //generate table
         document.body.innerHTML = userList.getTableHtml();
+        //update URL
+        updateSearchParams();
     }
 });
+
+function updateSearchParams() {
+    location.search = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+}
 
 function parseSearchParams() {
     const searchString = location.search.split('?').pop();
