@@ -73,7 +73,7 @@ document.addEventListener('click', function (event) {
 
 function parseSearchParams() {
     console.log(location);
-    const searchString = location.search.substr(1);
+    const searchString = location.search.split('?').pop();
     let tmp = searchString.split('&');
     let searchParams = {};
 
