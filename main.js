@@ -104,7 +104,10 @@ document.addEventListener('click', function (event) {
 });
 
 function updateSearchParams() {
-    location.search = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+    let tmp = location.href.split('?');
+    let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+    tmp[tmp.length-1] = searchString;
+    location.href = tmp.join('');
 }
 
 function parseSearchParams() {
