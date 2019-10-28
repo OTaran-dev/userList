@@ -10,6 +10,8 @@ class User {
 }
 
 class UserList extends Array {
+    sortedByKey = '';
+    sortOrder = '';
 
     sortBy(key, order) {
         this.sort((userA, userB) => {
@@ -28,14 +30,27 @@ class UserList extends Array {
                 (order == 'desc') ? (comparison * -1) : comparison
             );
         })
+        this.sortedByKey = key;
+        this.sortOrder = order;
+        console.log('sorted by ' + key + ', order - ' + order);
     }
 
     getTableHtml() {
+        const currentSortKey = this.sortedByKey;
+        const currentSortOrder = this.sortOrder;
         const firstUser = this[0];
         const tempLineHead = Object.keys(firstUser).map(function (key) {
             const data = firstUser[key];
             if (typeof (data) !== 'object') {
-                return `<th scope="col">${key}</th>`
+                let sortIcon;
+                if (key == currentSortKey){
+                    if (currentSortOrder == 'asc') sortIcon = '↑';
+                    else sortIcon = '↓';
+                }
+                else sortIcon = '';
+                let orderFlag = `<div class='order-flag'>${sortIcon}</div>`;
+                let colName = `<div class='col-name'>${key}</div>`;
+                return `<th scope="col">${orderFlag}${colName}</th>`;
             }
         }).join('');
 
@@ -61,18 +76,32 @@ data.forEach(element => {
 });
 
 userList.sortBy('id', 'asc');
+console.log(userList);
 document.body.innerHTML = userList.getTableHtml();
 parseSearchParams();
 
 document.addEventListener('click', function (event) {
     if (event.target.tagName === 'TH') {
-        userList.sortBy(event.target.innerHTML, 'asc');
+        let order;
+        let sortKey = event.target.querySelector('.col-name').innerHTML;
+        
+        if (sortKey == userList.sortedByKey){
+            if (event.target.querySelector('.order-flag').innerHTML == '↑' && userList.sortOrder == 'asc'){
+                order = 'desc';
+            }
+            else {
+                order = 'asc';
+            }
+        }
+        else order = 'asc';
+        //sort list
+        userList.sortBy(sortKey, order);
+        //generate table
         document.body.innerHTML = userList.getTableHtml();
     }
 });
 
 function parseSearchParams() {
-    console.log(location);
     const searchString = location.search.split('?').pop();
     let tmp = searchString.split('&');
     let searchParams = {};
@@ -83,7 +112,6 @@ function parseSearchParams() {
         searchParams[p[0]] = p[1];
     });
 
-    console.log(searchParams);
     if (searchParams.sortBy) {
         let order;
         if (searchParams.order) order = searchParams.order;
