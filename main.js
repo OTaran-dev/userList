@@ -32,10 +32,9 @@ class UserList extends Array {
         })
         this.sortedByKey = key;
         this.sortOrder = order;
-        console.log('sorted by ' + key + ', order - ' + order);
     }
 
-    getTableHtml() {
+    renderTable() {
         const currentSortKey = this.sortedByKey;
         const currentSortOrder = this.sortOrder;
         const firstUser = this[0];
@@ -69,16 +68,29 @@ class UserList extends Array {
     }
 }
 
-const userList = new UserList();
-data.forEach(element => {
-    let user = new User(element);
-    userList.push(user);
-});
+let userList = new UserList();
 
-userList.sortBy('id', 'asc');
-console.log(userList);
-document.body.innerHTML = userList.getTableHtml();
-parseSearchParams();
+let xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/users');
+xhr.send();
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+            let data = stringToArray(xhr.responseText);
+
+            data.forEach(element => {
+                let user = new User(element);
+                userList.push(user);
+            });
+
+            document.querySelector('.container-fluid').innerHTML = userList.renderTable();
+            parseSearchParams();
+        } else {
+            document.querySelector('.table-title').innerText = xhr.status;
+        }
+    }
+}
+
 
 document.addEventListener('click', function (event) {
     if (event.target.tagName === 'TH') {
@@ -94,30 +106,15 @@ document.addEventListener('click', function (event) {
             }
         }
         else order = 'asc';
-        //sort list
         userList.sortBy(sortKey, order);
-        //generate table
-        document.body.innerHTML = userList.getTableHtml();
-        //update URL
+        document.querySelector('.container-fluid').innerHTML = userList.renderTable();
         updateSearchParams();
     }
 });
 
 function updateSearchParams() {
-    let githubHost = 'https://github.com';
-    if (location.search.search(githubHost)) {
-        let tmp = location.search.split('?');
-        let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
-        if (tmp.length > 2) { //for correct test on GitHub
-            tmp[tmp.length - 1] = searchString;
-            location.search = tmp.join('');
-        }
-        else location.search = tmp.join('') + searchString;
-    }
-    else {
-        let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
-        location.search = searchString;
-    }
+    let searchString = '?' + 'sortBy=' + userList.sortedByKey + '&order=' + userList.sortOrder;
+    location.search = searchString;
 }
 
 function parseSearchParams() {
@@ -126,7 +123,6 @@ function parseSearchParams() {
     let searchParams = {};
 
     tmp.forEach(function (p) {
-        console.log(p);
         p = p.split('=');
         searchParams[p[0]] = p[1];
     });
@@ -136,6 +132,15 @@ function parseSearchParams() {
         if (searchParams.order) order = searchParams.order;
         else order = 'asc';
         userList.sortBy(searchParams.sortBy, order);
-        document.body.innerHTML = userList.getTableHtml();
+        document.querySelector('.container-fluid').innerHTML = userList.renderTable();
     }
+}
+
+function stringToArray(str) {
+    let tmpObject = JSON.parse(str);
+    let array = [];
+    for (var i in tmpObject) {
+        array.push(tmpObject[i]);
+    }
+    return array;
 }
